@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Schedule</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+        body { font-family: 'Space Grotesk', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1a202c 100%); color: #e2e8f0; min-height: 100vh; }
+        .schedule-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(129, 140, 248, 0.3); }
+        .task-item { border-left: 4px solid #f59e0b; transition: all 0.2s; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 50; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="w-full max-w-3xl mx-auto">
+        <div class="flex items-center justify-between p-4 mb-8 bg-slate-800 rounded-xl shadow-lg">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left text-2xl"></i></a>
+            <h1 class="text-2xl font-bold text-white">My Study Schedule</h1>
+            <button onclick="toggleModal()" class="text-indigo-400 hover:text-white transition"><i class="fas fa-plus-circle text-2xl"></i></button>
+        </div>
+
+        <div class="schedule-card p-6 rounded-2xl">
+            <h2 class="text-xl font-bold text-white mb-6">Today's Study Plan</h2>
+            <div id="task-list" class="space-y-4">
+                </div>
+            <button onclick="toggleModal()" class="w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg">
+                Fix Study Time <i class="fas fa-clock ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="taskModal" class="modal p-4">
+        <div class="bg-slate-800 p-6 rounded-2xl w-full max-w-md border border-indigo-500">
+            <h3 class="text-xl font-bold mb-4 text-white">Fix Study Session</h3>
+            <input type="text" id="subject" placeholder="Subject Name (e.g. DBMS)" class="w-full p-3 mb-3 bg-slate-900 rounded-xl border border-slate-700 outline-none focus:border-indigo-500">
+            <input type="time" id="taskTime" class="w-full p-3 mb-4 bg-slate-900 rounded-xl border border-slate-700 outline-none">
+            <div class="flex gap-2">
+                <button onclick="toggleModal()" class="flex-1 bg-slate-700 p-3 rounded-xl">Cancel</button>
+                <button onclick="addTask()" class="flex-1 bg-indigo-600 p-3 rounded-xl font-bold">Set Reminder</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="alarmSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+<script>
+
+let tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
+let swRegistration = null;
+
+// 1. Service Worker Register
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+        swRegistration = reg;
+        console.log("Service Worker Registered!");
+    });
+}
+
+// 2. Notification Permission & Initial Render
+window.onload = () => {
+    if (Notification.permission !== 'granted') {
+        Notification.requestPermission();
+    }
+    renderTasks(); // Page khulte hi purane tasks dikhao
+};
+
+// --- MODAL TOGGLE ---
+function toggleModal() {
+    const modal = document.getElementById('taskModal');
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+}
+
+// --- ADD TASK ---
+function addTask() {
+    const subject = document.getElementById('subject').value;
+    const time = document.getElementById('taskTime').value;
+
+    if(!subject || !time) return alert("Pehle Subject aur Time bharo!");
+
+    const newTask = { subject, time, id: Date.now(), notified: false };
+    tasks.push(newTask);
+    localStorage.setItem('studyTasks', JSON.stringify(tasks));
+    
+    document.getElementById('subject').value = '';
+    toggleModal();
+    renderTasks(); // Naya task list mein dikhao
+}
+
+// --- RENDER TASKS (Ye missing tha!) ---
+function renderTasks() {
+    const container = document.getElementById('task-list');
+    if (!container) return;
+    
+    container.innerHTML = tasks.length ? '' : '<p class="text-slate-500 text-center py-4">Koi schedule nahi hai.</p>';
+    
+    tasks.sort((a,b) => a.time.localeCompare(b.time)).forEach(task => {
+        container.innerHTML += `
+            <div class="task-item p-4 rounded-xl bg-slate-800/50 flex items-center justify-between border border-slate-700 mb-3">
+                <div>
+                    <p class="text-lg font-bold text-white">${task.subject}</p>
+                    <p class="text-sm text-slate-400"><i class="far fa-clock mr-2"></i>${task.time}</p>
+                </div>
+                <button onclick="deleteTask(${task.id})" class="text-slate-500 hover:text-red-500 transition p-2">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+    });
+}
+
+// --- DELETE TASK ---
+function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    localStorage.setItem('studyTasks', JSON.stringify(tasks));
+    renderTasks();
+}
+
+// --- Background Alarm Checker ---
+setInterval(() => {
+    const now = new Date();
+    const currentTime = now.getHours().toString().padStart(2, '0') + ":" + 
+                        now.getMinutes().toString().padStart(2, '0');
+
+    tasks.forEach(task => {
+        if (task.time === currentTime && !task.notified) {
+            const audio = document.getElementById('alarmSound');
+            if(audio) {
+                audio.muted = false;
+                audio.play().catch(() => console.log("Sound blocked"));
+            }
+
+            if (swRegistration && swRegistration.active) {
+                swRegistration.active.postMessage({
+                    type: 'SHOW_ALARM',
+                    subject: task.subject
+                });
+            } else if (Notification.permission === "granted") {
+                new Notification("📚 Study Time!", { body: `Bhai, ${task.subject} padh lo!` });
+            }
+
+            task.notified = true;
+            localStorage.setItem('studyTasks', JSON.stringify(tasks));
+            alert(`⏰ ALARM: ${task.subject} ka time ho gaya!`);
+            renderTasks();
+        }
+    });
+}, 1000);
+
+</script>
+</body>
+</html>

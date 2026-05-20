@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with AI - Student Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+        body { font-family: 'Space Grotesk', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1a202c 100%); color: #e2e8f0; min-height: 100vh; }
+        .chat-container { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(129, 140, 248, 0.3); }
+        .message-bubble { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Styling for AI formatted text */
+        .ai-content strong { color: #818cf8; font-weight: bold; }
+        .ai-content ul { list-style-type: disc; margin-left: 20px; margin-top: 10px; }
+        #chat-box::-webkit-scrollbar { width: 6px; }
+        #chat-box::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center">
+    <div class="w-full max-w-2xl flex flex-col h-[90vh] chat-container rounded-3xl overflow-hidden">
+        <div class="flex items-center justify-between p-4 bg-slate-800 border-b border-slate-700">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left text-xl"></i></a>
+            <h1 class="text-xl font-bold text-white">Study Buddy AI ✨</h1>
+            <div class="w-6"></div>
+        </div>
+
+        <div id="chat-box" class="flex-grow p-4 overflow-y-auto space-y-4 flex flex-col">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center mr-3"><i class="fas fa-robot text-white text-xs"></i></div>
+                <div class="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[80%] border border-slate-700">
+                    <p class="text-sm">Hello! Main aapka AI tutor hoon. Kya padhna hai aaj? 📚</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-700 bg-slate-800 flex items-center">
+            <input id="user-input" type="text" placeholder="Pucho kuch bhi..." class="flex-grow p-3 px-5 rounded-full bg-slate-700 border border-slate-600 text-white outline-none mr-3">
+            <button onclick="sendMessage()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-3 rounded-full w-12 h-12 flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const inputField = document.getElementById('user-input');
+
+        function displayMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-4 items-start message-bubble`;
+            
+            // AI ke liye markdown format enable kiya
+            const formattedText = sender === 'ai' ? marked.parse(text) : `<p>${text}</p>`;
+
+            messageDiv.innerHTML = sender === 'user' ? `
+                <div class="bg-purple-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[80%] shadow-md"><div class="text-sm">${text}</div></div>
+                <div class="flex-shrink-0 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center ml-3 border border-purple-400"><i class="fas fa-user text-white text-xs"></i></div>
+            ` : `
+                <div class="flex-shrink-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center mr-3 border border-indigo-400"><i class="fas fa-robot text-white text-xs"></i></div>
+                <div class="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[80%] shadow-md border border-slate-700 ai-content">
+                    <div class="text-sm leading-relaxed">${formattedText}</div>
+                </div>
+            `;
+            
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = inputField.value.trim();
+            if (!message) return;
+
+            displayMessage(message, 'user');
+            inputField.value = '';
+
+            const typingId = "typing-" + Date.now();
+            const typingDiv = document.createElement('div');
+            typingDiv.id = typingId;
+            typingDiv.className = "flex justify-start mb-4 opacity-70";
+            typingDiv.innerHTML = `<div class="bg-slate-800 text-slate-400 p-3 rounded-2xl text-xs italic ml-11">AI soch raha hai... 🤔</div>`;
+            chatBox.appendChild(typingDiv);
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const data = await response.json();
+                document.getElementById(typingId).remove();
+                displayMessage(data.reply || "Kuch problem hui!", 'ai');
+            } catch (err) {
+                document.getElementById(typingId).remove();
+                displayMessage("Server down hai! ❌", 'ai');
+            }
+        }
+
+        inputField.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+    </script>
+</body>
+</html>

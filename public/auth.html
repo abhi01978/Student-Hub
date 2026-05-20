@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth - AI Student Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+        body { font-family: 'Space Grotesk', sans-serif; background: #0f172a; color: #e2e8f0; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(129, 140, 248, 0.2); }
+        .hidden { display: none; }
+        select option { background: #1e293b; color: white; }
+        /* Custom scrollbar for dropdown */
+        select::-webkit-scrollbar { width: 8px; }
+        select::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="glass-card p-8 rounded-[2.5rem] w-full max-w-md shadow-2xl">
+        <div class="text-center mb-8">
+            <h1 id="authTitle" class="text-3xl font-extrabold text-purple-400">Welcome Back</h1>
+            <p id="authSubTitle" class="text-slate-400 text-sm mt-2">Login to continue your journey</p>
+        </div>
+
+        <form id="authForm" class="space-y-4">
+            <div id="usernameGroup" class="hidden">
+                <div class="relative">
+                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input type="text" id="username" placeholder="Full Name" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-purple-500 transition">
+                </div>
+            </div>
+
+            <div id="classGroup" class="hidden">
+                <div class="relative">
+                    <i class="fas fa-user-graduate absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <select id="userClass" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-purple-500 transition appearance-none cursor-pointer">
+                        <option value="" disabled selected>Select Your Course</option>
+                        <option value="BCA">BCA (Comp. Apps)</option>
+                        <option value="MCA">MCA (Master Apps)</option>
+                        <option value="B.Tech">B.Tech (Engineering)</option>
+                        <option value="M.Tech">M.Tech (Engineering)</option>
+                        <option value="B.Sc">B.Sc (Science)</option>
+                        <option value="B.Com">B.Com (Commerce)</option>
+                        <option value="BA">BA (Arts)</option>
+                        <option value="LLB">LLB (Law)</option>
+                        <option value="MBA">MBA (Business)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="relative">
+                <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                <input type="email" id="email" required placeholder="Email Address" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-purple-500 transition">
+            </div>
+
+            <div class="relative">
+                <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                <input type="password" id="password" required placeholder="Password" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-purple-500 transition">
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 py-4 rounded-2xl font-bold shadow-lg hover:scale-[1.02] active:scale-95 transition-all mt-4">
+                Login
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <p class="text-sm text-slate-400">
+                <span id="toggleText">Don't have an account?</span>
+                <button id="toggleBtn" class="text-purple-400 font-bold ml-1 hover:underline">Sign Up</button>
+            </p>
+        </div>
+    </div>
+
+<script>
+    const authForm = document.getElementById('authForm');
+    const authTitle = document.getElementById('authTitle');
+    const authSubTitle = document.getElementById('authSubTitle');
+    const usernameGroup = document.getElementById('usernameGroup');
+    const classGroup = document.getElementById('classGroup');
+    const submitBtn = document.getElementById('submitBtn');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const toggleText = document.getElementById('toggleText');
+
+    let isLogin = true;
+
+    // Toggle between Login and Signup
+    toggleBtn.addEventListener('click', () => {
+        isLogin = !isLogin;
+        if (isLogin) {
+            authTitle.innerText = "Welcome Back";
+            authSubTitle.innerText = "Login to continue your journey";
+            usernameGroup.classList.add('hidden');
+            classGroup.classList.add('hidden');
+            submitBtn.innerText = "Login";
+            toggleText.innerText = "Don't have an account?";
+            toggleBtn.innerText = "Sign Up";
+        } else {
+            authTitle.innerText = "Create Account";
+            authSubTitle.innerText = "Join the AI Student Hub today";
+            usernameGroup.classList.remove('hidden');
+            classGroup.classList.remove('hidden');
+            submitBtn.innerText = "Sign Up";
+            toggleText.innerText = "Already have an account?";
+            toggleBtn.innerText = "Login";
+        }
+    });
+
+ authForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Sabse important line: page refresh rokne ke liye
+    
+    console.log("Submit button dab gaya!"); // Check karne ke liye ki function chala ya nahi
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const username = document.getElementById('username') ? document.getElementById('username').value : "";
+    const selectedCourse = document.getElementById('userClass') ? document.getElementById('userClass').value : "";
+
+    // Agar Signup mode hai toh check karo
+    if (!isLogin && (!username || !selectedCourse)) {
+        alert("Bhai, Name aur Course fill karo!");
+        return;
+    }
+
+    const url = isLogin ? '/api/login' : '/api/signup';
+    const bodyData = isLogin ? { email, password } : { username, email, password, class: selectedCourse };
+
+    console.log("Sending Data to server:", bodyData);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData)
+        });
+
+        const data = await response.json();
+        console.log("Server Response:", data);
+
+        if (response.ok) {
+            if (isLogin) {
+                localStorage.setItem('username', data.username);
+                localStorage.setItem('userClass', data.class);
+                localStorage.setItem('isLoggedIn', 'true');
+                window.location.href = 'index.html';
+            } else {
+                alert("Account ban gaya! Ab login karo.");
+                location.reload();
+            }
+        } else {
+            alert("Server ne mana kar diya: " + (data.error || "Unknown Error"));
+        }
+    } catch (err) {
+        console.error("Fetch Error:", err);
+        alert("Server se connection nahi ho paya. Check karo terminal mein server chal raha hai?");
+    }
+});
+</script>
+</body>
+</html>

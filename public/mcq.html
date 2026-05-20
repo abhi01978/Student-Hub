@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Student Hub - Smart Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; }
+        .custom-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        
+        .correct { background-color: #dcfce7 !important; border-color: #22c55e !important; color: #166534 !important; transform: scale(1.02); }
+        .wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b !important; }
+        
+        .option-btn { transition: all 0.2s ease; position: relative; overflow: hidden; }
+        .option-btn:hover:not([disabled]) { 
+            border-color: #6366f1; 
+            background-color: #f8faff; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+    </style>
+</head>
+<body class="pb-24">
+
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-100 px-6 py-4 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-500 hover:text-indigo-600 font-bold text-sm transition flex items-center gap-1">
+                <i class="fas fa-arrow-left text-xs"></i> Home
+            </a>
+            <div class="h-6 w-[1px] bg-slate-200 mx-2"></div>
+            <div>
+                <h1 class="text-xs font-bold text-indigo-600 uppercase tracking-widest">AI Quiz Mode</h1>
+                <p id="quiz-title" class="text-lg font-extrabold text-slate-800 leading-none">Loading...</p>
+            </div>
+        </div>
+        <div class="bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100">
+            <span id="score-display" class="text-indigo-600 font-bold text-sm">Score: 0/10</span>
+        </div>
+    </header>
+
+    <div id="quiz-container" class="max-w-2xl mx-auto px-4 mt-8 space-y-10">
+        </div>
+
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent text-center">
+        <button onclick="location.reload()" class="w-full max-w-2xl mx-auto block bg-slate-900 text-white font-extrabold py-5 rounded-[2rem] shadow-2xl hover:bg-indigo-600 transition-all active:scale-95">
+            Reset Quiz <i class="fas fa-redo ml-2"></i>
+        </button>
+    </div>
+
+   <script>
+    // Page load hote hi function call karein
+    window.onload = loadMCQs;
+
+    async function loadMCQs() {
+        const quizContainer = document.getElementById('quiz-container');
+        quizContainer.innerHTML = `<div class="text-center p-10"><i class="fas fa-spinner fa-spin text-4xl text-indigo-600"></i><p class="mt-4">AI Questions load ho rahe hain...</p></div>`;
+
+        const studentClass = localStorage.getItem('userClass') || 'BCA';
+        document.getElementById('quiz-title').innerText = `Science - Class ${studentClass}`;
+
+        try {
+            const response = await fetch('/api/get-mcqs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentClass, subject: "Science" })
+            });
+
+            const questions = await response.json();
+            displayQuestions(questions); // Display function call karein
+        } catch (error) {
+            console.error("MCQ Error:", error);
+            quizContainer.innerHTML = `<p class="text-center text-red-400">Server connect nahi ho raha!</p>`;
+        }
+    }
+
+    function displayQuestions(questions) {
+        const quizContainer = document.getElementById('quiz-container');
+        quizContainer.innerHTML = ''; 
+
+        if (!questions || questions.length === 0) {
+            quizContainer.innerHTML = '<p class="text-center">Koi questions nahi mile.</p>';
+            return;
+        }
+
+        questions.forEach((q, index) => {
+            // Tumhari file ke hisaab se mapping
+            const qText = q.text || q.question;
+            const qOptions = q.options || [];
+            const qCorrect = q.correct || q.answer;
+
+            if (!qText || qOptions.length === 0) return;
+
+            const qBlock = document.createElement('div');
+            qBlock.className = "bg-white p-6 rounded-[2rem] border border-slate-100 custom-shadow mb-6";
+            
+            // Safe replace function
+            const safeAnswer = String(qCorrect).replace(/'/g, "\\'");
+
+            qBlock.innerHTML = `
+                <h3 class="text-lg font-bold mb-4 text-slate-800">${index + 1}. ${qText}</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    ${qOptions.map(opt => {
+                        const safeOpt = String(opt).replace(/'/g, "\\'");
+                        return `
+                            <button onclick="checkAns(this, '${safeAnswer}', '${safeOpt}')" 
+                                class="option-btn w-full text-left p-4 rounded-2xl border border-slate-200 font-semibold text-slate-600 hover:bg-indigo-50 transition-all">
+                                ${opt}
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            quizContainer.appendChild(qBlock);
+        });
+    }
+
+    let score = 0;
+    function checkAns(btn, correct, selected) {
+        const buttons = btn.parentElement.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+            document.getElementById('score-display').innerText = `Score: ${score}/10`;
+        } else {
+            btn.classList.add('wrong');
+            buttons.forEach(b => {
+                if (b.innerText.trim() === correct) b.classList.add('correct');
+            });
+        }
+    }
+</script>
+
+    
+</body>
+</html>

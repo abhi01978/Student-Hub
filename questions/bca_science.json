@@ -1,0 +1,102 @@
+[
+  {
+    "text": "What is the full form of SCADA?",
+    "options": [
+      "System Control And Data Acquisition",
+      "System Control And Data Analysis",
+      "System Control And Distribution Analysis",
+      "System Console And Data Access"
+    ],
+    "correct": "System Control And Data Acquisition"
+  },
+  {
+    "text": "What is the main disadvantage of a LAN?",
+    "options": [
+      "Cost-effectiveness",
+      "Easy expansion",
+      "Security risks due to its local nature",
+      "Inter-connecting various networks"
+    ],
+    "correct": "Security risks due to its local nature"
+  },
+  {
+    "text": "Which of the following protocols is used in the TCP/IP network stack for DNS (Domain Name System) resolution?",
+    "options": [
+      "ICMP (Internet Control Message Protocol)",
+      "UDP (User Datagram Protocol) and DNS",
+      "TCP (Transmission Control Protocol) and DNS",
+      "BGP (Border Gateway Protocol)"
+    ],
+    "correct": "UDP (User Datagram Protocol) and DNS"
+  },
+  {
+    "text": "What is the primary function of the BIOS in a computer?",
+    "options": [
+      "To operate the OS",
+      "Hardware management including the boot process",
+      "To manage data storage",
+      "For user communication with computer"
+    ],
+    "correct": "Hardware management including the boot process"
+  },
+  {
+    "text": "What are the 3 main components of a basic computer? ",
+    "options": [
+      "Input, Output, and Data Storage",
+      "System Unit, Keyboard and Monitor",
+      "Monitor, Keyboard and Mouse",
+      "System Unit, Power supply and Cooling System"
+    ],
+    "correct": "Input, Output, and Data Storage"
+  },
+  {
+    "text": "A firewall is a network security system that monitors and controls incoming and outgoing network traffic based on predetermined security rules. What is another name for this type of network security system?",
+    "options": [
+      "Intrusion Detection System",
+      "Network Access Control System",
+      "Internet Service Gateways",
+      "Intrusion Prevention System"
+    ],
+    "correct": "Intrusion Prevention System"
+  },
+  {
+    "text": "What is the term for a network that connects two or more LANs together?",
+    "options": [
+      "WAN(Wide Area Network)",
+      "Internet Service Provider",
+      "VPN(Virtual Private Network)",
+      "MAN(Metropolitan Area Network)"
+    ],
+    "correct": "WAN(Wide Area Network)"
+  },
+  {
+    "text": "What are two common services used in the Internet's domain name system (DNS)?",
+    "options": [
+      "WHOIS and DNS Query",
+      "FTP and SSH",
+      "HTTP and DNS",
+      "DNS and DHCP"
+    ],
+    "correct": "DNS and DHCP"
+  },
+  {
+    "text": "What is the term for an IP address with a prefix that denotes it as a private, local address which is used on private networks?",
+    "options": [
+      "IPv4",
+      "IPv6",
+      "RFC1918 Address",
+      "Public IP Address"
+    ],
+    "correct": "RFC1918 Address"
+  },
+  {
+    "text": "What is the purpose of the DHCP (Dynamic Host Configuration Protocol)?",
+    "options": [
+      "To set up an internet connection",
+      "To manage a computer's hardware",
+      "To automatically assign IP addresses and subnet masks to devices in a network",
+      "To encrypt data sent over a network"
+    ],
+    "correct": "To automatically assign IP addresses and subnet masks to devices in a network"
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "text": "What is the basic unit of life in living organisms?",
+    "options": [
+      "Cell",
+      "Tissue",
+      "Organ"
+    ],
+    "correct": "Cell"
+  },
+  {
+    "text": "Which type of rock is formed from the cooling and solidification of molten lava?",
+    "options": [
+      "Igneous",
+      "Sedimentary",
+      "Metamorphic"
+    ],
+    "correct": "Igneous"
+  },
+  {
+    "text": "What is the process by which plants release water vapor into the air?",
+    "options": [
+      "Respiration",
+      "Photosynthesis",
+      "Transpiration"
+    ],
+    "correct": "Transpiration"
+  },
+  {
+    "text": "Which part of the cell is responsible for controlling what enters and leaves the cell?",
+    "options": [
+      "Mitochondria",
+      "Chloroplast",
+      "Plasma membrane"
+    ],
+    "correct": "Plasma membrane"
+  },
+  {
+    "text": "What is the term for the movement of molecules from an area of high concentration to an area of low concentration?",
+    "options": [
+      "Diffusion",
+      "Osmosis",
+      "Active transport"
+    ],
+    "correct": "Diffusion"
+  },
+  {
+    "text": "Which type of energy is generated from the heat produced by the reaction between coal, water, and air?",
+    "options": [
+      "Renewable",
+      "Non-renewable",
+      "Nuclear"
+    ],
+    "correct": "Non-renewable"
+  },
+  {
+    "text": "What is the process by which plants convert sunlight into energy?",
+    "options": [
+      "Respiration",
+      "Photosynthesis",
+      "Decomposition"
+    ],
+    "correct": "Photosynthesis"
+  },
+  {
+    "text": "Which part of the plant is responsible for absorbing water and minerals from the soil?",
+    "options": [
+      "Roots",
+      "Stems",
+      "Leaves"
+    ],
+    "correct": "Roots"
+  },
+  {
+    "text": "What is the term for the movement of water through a plant, from the roots to the leaves?",
+    "options": [
+      "Transpiration",
+      "Photosynthesis",
+      "Translocation"
+    ],
+    "correct": "Translocation"
+  },
+  {
+    "text": "Which type of rock is formed when existing rocks are subjected to high temperatures and pressures?",
+    "options": [
+      "Igneous",
+      "Sedimentary",
+      "Metamorphic"
+    ],
+    "correct": "Metamorphic"
+  }
+]
